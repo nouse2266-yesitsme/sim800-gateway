@@ -1,36 +1,39 @@
 const express = require("express");
-const fetch = require("node-fetch");
 
 const app = express();
 
-app.get("/", (req,res)=>{
-    res.send("Gateway running");
+// important for Railway
+app.enable("trust proxy");
+
+// simple test route
+app.get("/", (req, res) => {
+  res.send("SIM800 gateway running");
 });
 
-app.get("/data", async (req,res)=>{
+// SIM800 data endpoint
+app.get("/data", (req, res) => {
 
-    console.log("Received:", req.query);
+  const lat = req.query.lat;
+  const lng = req.query.lng;
+  const speed = req.query.speed;
+  const battery = req.query.battery;
+  const timestamp = req.query.timestamp;
 
-    const params = new URLSearchParams(req.query).toString();
+  console.log("Data received:");
+  console.log({
+    lat,
+    lng,
+    speed,
+    battery,
+    timestamp
+  });
 
-    const renderURL =
-    "https://vehicle-tracker-server-1.onrender.com/data?" + params;
-
-    try{
-
-        await fetch(renderURL);
-
-        res.send("Forwarded");
-
-    }catch(err){
-
-        console.log(err);
-        res.send("Error forwarding");
-
-    }
-
+  // send simple response (SIM800 likes very small responses)
+  res.status(200).send("OK");
 });
 
-app.listen(process.env.PORT || 3000, ()=>{
-    console.log("Server started");
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log("Server running on port " + PORT);
 });
