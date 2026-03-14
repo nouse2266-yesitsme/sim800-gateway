@@ -3,31 +3,34 @@ const fetch = require("node-fetch");
 
 const app = express();
 
-app.get("/data", async (req, res) => {
+app.get("/", (req,res)=>{
+    res.send("Gateway running");
+});
+
+app.get("/data", async (req,res)=>{
+
+    console.log("Received:", req.query);
 
     const params = new URLSearchParams(req.query).toString();
 
     const renderURL =
     "https://vehicle-tracker-server-1.onrender.com/data?" + params;
 
-    try {
+    try{
 
         await fetch(renderURL);
 
-        console.log("Forwarded:", renderURL);
+        res.send("Forwarded");
 
-        res.send("OK");
-
-    } catch (err) {
+    }catch(err){
 
         console.log(err);
-
-        res.send("ERROR");
+        res.send("Error forwarding");
 
     }
 
 });
 
-app.listen(3000, () => {
-    console.log("Gateway running");
+app.listen(process.env.PORT || 3000, ()=>{
+    console.log("Server started");
 });
